@@ -26,23 +26,21 @@ const posts = [
     title: "Nike Shoes",
     body: "Brand new nike shoes is on sale",
     isPublished: true,
-    author: '1a'
+    author: "1a"
   },
   {
     id: "2",
     title: "Pocophone f1",
     body: "Get brand new xiaomi pocophone at cheapest price",
     isPublished: true,
-    author: '1b'
-
+    author: "1b"
   },
   {
     id: "3",
     title: "Oneplus 6T",
     body: "One plus releases 6T",
     isPublished: false,
-    author: '1b'
-
+    author: "1b"
   }
 ];
 
@@ -59,6 +57,7 @@ const typeDefs = `
     name: String!,
     email: String,
     age: Int
+    posts: [Post]!
   }
 
   type Post{
@@ -112,10 +111,19 @@ const resolvers = {
     }
   },
   Post: {
-    author(parent, args, ctx, info){
-      return users.find(user=>{
-       return user.id === parent.author
-      })
+    author(parent, args, ctx, info) {
+      return users.find(user => {
+        // return single value if post's author === user's id
+        return user.id === parent.author;
+      });
+    }
+  },
+  User: {
+    posts(parent, args, ctx, info) {
+      return posts.filter(post => {
+        // return array if post's author === user's id        
+        return parent.id === post.author;
+      });
     }
   }
 };
