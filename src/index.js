@@ -1,6 +1,24 @@
-import addnumber, { subtract } from './math';
+import { GraphQLServer } from "graphql-yoga";
 
-console.log('Hello Graphql')
+const typeDefs = `
+  type Query{
+    hello: String!
+  }
+`;
 
-console.log(addnumber(2, 4))
-console.log(subtract(2, 4))
+const resolvers = {
+  Query: {
+    hello() {
+      return "This is my first Query";
+    }
+  }
+};
+
+const server = new GraphQLServer({
+  typeDefs,
+  resolvers
+});
+
+server.start(() => {
+  console.log("GraphQL server is up and running!");
+});
