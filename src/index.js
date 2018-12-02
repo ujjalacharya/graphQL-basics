@@ -1,11 +1,52 @@
 import { GraphQLServer } from "graphql-yoga";
 
+const users = [
+  {
+    id: "123",
+    name: "Ujjal",
+    email: "acharyaujjal1@gmail.com",
+    age: 22
+  },
+  {
+    id: "213",
+    name: "Colt",
+    email: "colt@gmail.com",
+    age: 29
+  },
+  {
+    id: "112",
+    name: "Stephen",
+    email: "grider@gmail.com",
+    age: 27
+  }
+];
+const posts = [
+  {
+    id: "123",
+    title: "Nike Shoes",
+    body: "Brand new nike shoes is on sale",
+    isPublished: true
+  },
+  {
+    id: "213",
+    title: "Pocophone f1",
+    body: "Get brand new xiaomi pocophone at cheapest price",
+    isPublished: true
+  },
+  {
+    id: "112",
+    title: "Oneplus 6T",
+    body: "One plus releases 6T",
+    isPublished: false
+  }
+];
+
 const typeDefs = `
   type Query{
-    greetings(name: String): String!
+    users(query: String): [User!]!
+    posts(query: String): [Post!]!
     me: User!
     post: Post!
-    add(numbers: [Float!]!): Float!
   }
 
   type User{
@@ -25,19 +66,27 @@ const typeDefs = `
 `;
 const resolvers = {
   Query: {
-    add(parent, args) {
-      if (args.numbers.length) {
-        return args.numbers.reduce((acc, current) => {
-          return acc + current;
+    posts(parent, args, ctx, info) {
+      if (args.query) {
+        return posts.filter(post => {
+          const title = post.title
+            .toLowerCase()
+            .includes(args.query.toLowerCase());
+          const body = post.body
+            .toLowerCase()
+            .includes(args.query.toLowerCase());
+          return title || body;
         });
       }
-      return 0;
+      return posts;
     },
-    greetings(parent, args) {
-      if (args.name) {
-        return `Hey there, ${args.name}!`;
+    users(parent, args, ctx) {
+      if (args.query) {
+        return users.filter(user => {
+          return user.name.toLowerCase().includes(args.query.toLowerCase());
+        });
       }
-      return "Hey there, Guest!";
+      return users;
     },
     me() {
       return {
