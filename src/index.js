@@ -5,7 +5,7 @@ const typeDefs = `
     greetings(name: String): String!
     me: User!
     post: Post!
-    add(num1: Float!, num2: Float!): Float!
+    add(numbers: [Float!]!): Float!
   }
 
   type User{
@@ -25,15 +25,19 @@ const typeDefs = `
 `;
 const resolvers = {
   Query: {
-    add(parent, args){
-      let {num1, num2} = args;
-      return num1+num2
-    },
-    greetings(parent, args){
-      if(args.name){
-        return `Hey there, ${args.name}!`
+    add(parent, args) {
+      if (args.numbers.length) {
+        return args.numbers.reduce((acc, current) => {
+          return acc + current;
+        });
       }
-      return 'Hey there, Guest!'
+      return 0;
+    },
+    greetings(parent, args) {
+      if (args.name) {
+        return `Hey there, ${args.name}!`;
+      }
+      return "Hey there, Guest!";
     },
     me() {
       return {
@@ -43,13 +47,13 @@ const resolvers = {
         age: 22
       };
     },
-    post(){
-      return{
-        id: 'abc12',
-        title: 'Post about dogs',
-        body: 'Some description on dogs',
+    post() {
+      return {
+        id: "abc12",
+        title: "Post about dogs",
+        body: "Some description on dogs",
         isPublished: true
-      }
+      };
     }
   }
 };
