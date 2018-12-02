@@ -2,19 +2,19 @@ import { GraphQLServer } from "graphql-yoga";
 
 const users = [
   {
-    id: "123",
+    id: "1a",
     name: "Ujjal",
     email: "acharyaujjal1@gmail.com",
     age: 22
   },
   {
-    id: "213",
+    id: "1b",
     name: "Colt",
     email: "colt@gmail.com",
     age: 29
   },
   {
-    id: "112",
+    id: "1c",
     name: "Stephen",
     email: "grider@gmail.com",
     age: 27
@@ -22,22 +22,27 @@ const users = [
 ];
 const posts = [
   {
-    id: "123",
+    id: "1",
     title: "Nike Shoes",
     body: "Brand new nike shoes is on sale",
-    isPublished: true
+    isPublished: true,
+    author: '1a'
   },
   {
-    id: "213",
+    id: "2",
     title: "Pocophone f1",
     body: "Get brand new xiaomi pocophone at cheapest price",
-    isPublished: true
+    isPublished: true,
+    author: '1b'
+
   },
   {
-    id: "112",
+    id: "3",
     title: "Oneplus 6T",
     body: "One plus releases 6T",
-    isPublished: false
+    isPublished: false,
+    author: '1b'
+
   }
 ];
 
@@ -61,6 +66,7 @@ const typeDefs = `
     title: String!,
     body: String!,
     isPublished: Boolean!
+    author: User!
   }
 
 `;
@@ -103,6 +109,13 @@ const resolvers = {
         body: "Some description on dogs",
         isPublished: true
       };
+    }
+  },
+  Post: {
+    author(parent, args, ctx, info){
+      return users.find(user=>{
+       return user.id === parent.author
+      })
     }
   }
 };
