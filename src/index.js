@@ -156,16 +156,13 @@ const resolvers = {
   },
   Mutation: {
     createUser(parent, args, ctx, info) {
-      let { name, email, age } = args;
       const emailTaken = users.some(user => user.email === args.email);
       if (emailTaken) {
         throw new Error("Email taken!");
       }
       const newuser = {
         id: uuid4(),
-        name,
-        email,
-        age
+        ...args
       };
 
       users.push(newuser);
@@ -173,9 +170,8 @@ const resolvers = {
     },
 
     createPost(parent, args, ctx, info) {
-      let { title, body, isPublished, author } = args;
 
-      const authorExists = users.some(user => user.id === author);
+      const authorExists = users.some(user => user.id === args.author);
 
       if (!authorExists) {
         throw new Error("User does not exist");
@@ -183,24 +179,22 @@ const resolvers = {
 
       const newpost = {
         id: uuid4(),
-        title,
-        body,
-        isPublished,
-        author
+        ...args
       };
       posts.push(newpost);
       return newpost;
     },
 
     createComment(parent, args, ctx, info){
-      let {text, author, post} = args;
-      const authorExists = users.some(user=> user.id === author)
-      const postExists = posts.some(pos=> pos.id === post)
+      const authorExists = users.some(user=> user.id === args.author)
+      const postExists = posts.some(pos=>{
+        return (pos.id === args.post && pos.isPublished === true)
+      })
 
       if(authorExists && postExists){
         const newcomment = {
           id: uuid4(),
-          text, post, author
+          ...args
         }
         comments.push(newcomment);
         return newcomment;
