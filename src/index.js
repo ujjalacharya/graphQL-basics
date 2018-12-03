@@ -1,5 +1,5 @@
 import { GraphQLServer } from "graphql-yoga";
-import uuid4 from 'uuid/v4'
+import uuid4 from "uuid/v4";
 
 const users = [
   {
@@ -76,6 +76,7 @@ const typeDefs = `
 
   type Mutation{
     createUser(name: String!, email: String!, age: Int): User!
+    createPost(title: String!, body: String, isPublished: Boolean!, author: ID!): Post!
   }
 
   type User{
@@ -90,7 +91,7 @@ const typeDefs = `
   type Post{
     id: ID!,
     title: String!,
-    body: String!,
+    body: String,
     isPublished: Boolean!
     author: User!
     comments: [Comment]!
@@ -152,12 +153,12 @@ const resolvers = {
       };
     }
   },
-  Mutation:{
-    createUser(parent, args, ctx, info){
-      let {name, email, age} = args;
-      const emailTaken = users.some(user => user.email === args.email)
-      if(emailTaken){
-        throw new Error('Email taken!')
+  Mutation: {
+    createUser(parent, args, ctx, info) {
+      let { name, email, age } = args;
+      const emailTaken = users.some(user => user.email === args.email);
+      if (emailTaken) {
+        throw new Error("Email taken!");
       }
       const newuser = {
         id: uuid4(),
@@ -165,9 +166,29 @@ const resolvers = {
         email,
         age
       };
-      
+
       users.push(newuser);
       return newuser;
+    },
+
+    createPost(parent, args, ctx, info) {
+      let { title, body, isPublished, author } = args;
+
+      const authorExists = users.some(user => user.id === author);
+
+      if (!authorExists) {
+        throw new Error("User does not exist");
+      }
+
+      const newpost = {
+        id: uuid4(),
+        title,
+        body,
+        isPublished,
+        author
+      };
+      posts.push(newpost);
+      return newpost;
     }
   },
   Post: {
@@ -177,11 +198,11 @@ const resolvers = {
         return user.id === parent.author;
       });
     },
-    
-    comments(parent, args, ctx, info){
-      return comments.filter(comment=>{
-        return comment.post === parent.id
-      })
+
+    comments(parent, args, ctx, info) {
+      return comments.filter(comment => {
+        return comment.post === parent.id;
+      });
     }
   },
   User: {
@@ -206,10 +227,10 @@ const resolvers = {
       });
     },
 
-    post(parent, args, ctx, info){
-      return posts.find(post=>{
-        return post.id === parent.post
-      })
+    post(parent, args, ctx, info) {
+      return posts.find(post => {
+        return post.id === parent.post;
+      });
     }
   }
 };
